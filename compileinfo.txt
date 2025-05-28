@@ -1,0 +1,7 @@
+In order to compile this project you have to download all the data and do this steps:
+
+1) Type in your command window:
+gcc main.c game_logic.c hardware_io.c -o tmpproject
+
+2) Type the following:
+./tmpproject
