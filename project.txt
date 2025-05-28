@@ -1,0 +1,54 @@
+// Przykład dla Arduino IDE
+#include <EEPROM.h>
+
+struct PlayerData {
+  unsigned long money;
+  // Możesz dodać inne pola, np. imię gracza (jako tablica char), wygrane gry itp.
+  // char playerName[10];
+  // int gamesWon;
+};
+
+PlayerData player1;
+int eeAddress = 0; // Adres w EEPROM, od którego zaczynamy zapis danych
+
+void setup() {
+  Serial.begin(9600);
+
+  // Odczytaj dane gracza przy starcie
+  EEPROM.get(eeAddress, player1);
+
+  // Jeśli odczytane dane są "puste" lub niepoprawne (np. pierwszy rozruch), ustaw domyślną kwotę
+  // Prosty sposób sprawdzenia - EEPROM domyślnie jest wypełniona wartościami 0xFF
+  // Jeśli player1.money jest bardzo dużą liczbą, prawdopodobnie EEPROM nie była jeszcze zapisana
+  // lub można użyć "znacznika" (np. dodatkowy bajt sprawdzający, czy dane są poprawne)
+  if (player1.money > 2000000000) { // Przykładowy warunek, lepsze jest użycie sumy kontrolnej lub znacznika
+    Serial.println("Brak zapisanych danych lub dane niepoprawne. Ustawiam domyslna kwote.");
+    player1.money = 100; // Domyślna kwota startowa
+    EEPROM.put(eeAddress, player1); // Zapisz domyślne dane
+  }
+
+  Serial.print("Witaj! Twoj stan konta: ");
+  Serial.println(player1.money);
+}
+
+void loop() {
+  // ... logika gry ...
+
+  // Załóżmy, że gracz coś wygrał
+  // player1.money += wygrana;
+
+  // Załóżmy, że chcemy zapisać stan po naciśnięciu przycisku
+  // if (digitalRead(PRZYCISK_ZAPISU) == LOW) {
+  //   EEPROM.put(eeAddress, player1);
+  //   Serial.println("Postep zapisany!");
+  //   delay(500); // Debounce
+  // }
+
+  // Przykład: Co 10 sekund dodaj 10 do konta i zapisz (tylko do testów!)
+  delay(10000);
+  player1.money += 10;
+  EEPROM.put(eeAddress, player1);
+  Serial.print("Nowy stan konta: ");
+  Serial.print(player1.money);
+  Serial.println(" (Zapisano)");
+}
